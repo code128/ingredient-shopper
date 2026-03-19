@@ -46,6 +46,19 @@ export default function RecipeEditor({ recipe, onClose, onRecipeUpdated }: Recip
     setIngredients(prev => prev.map(ri => ri.id === id ? { ...ri, [field]: value } : ri));
   };
 
+  const handleAddIngredient = () => {
+    setIngredients(prev => [
+      ...prev,
+      {
+        id: `new-${Date.now()}`,
+        name: '',
+        quantity: '',
+        unit: '',
+        originalText: '',
+      },
+    ]);
+  };
+
   const handleSave = async () => {
     setSaving(true);
     setError(null);
@@ -136,6 +149,14 @@ export default function RecipeEditor({ recipe, onClose, onRecipeUpdated }: Recip
           </div>
         ))}
       </div>
+
+      <button 
+        onClick={handleAddIngredient} 
+        className={styles.addButton} 
+        disabled={saving}
+      >
+        + Add Ingredient
+      </button>
 
       <div className={styles.actions}>
         <button onClick={handleSave} className={styles.saveButton} disabled={saving}>

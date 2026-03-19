@@ -3,11 +3,11 @@ import prisma from '@/lib/prisma';
 
 export async function PATCH(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const body = await request.json();
-    const id = params.id;
+    const { id } = await params;
 
     if ('isSelected' in body) {
       const recipe = await prisma.recipe.update({
@@ -39,15 +39,29 @@ export async function PATCH(
             ingredientId = ingredient.id;
           }
 
-          await tx.recipeIngredient.update({
-            where: { id: ri.id },
-            data: {
-              ingredientId: ingredientId, // Link to new/found ingredient
-              quantity: ri.quantity === '' || ri.quantity === null ? null : parseFloat(ri.quantity),
-              unit: ri.unit === '' || ri.unit === null ? null : ri.unit,
-              originalText: ri.originalText,
-            }
-          });
+          if (!ingredientId) continue;
+
+          if (ri.id.startsWith('new-')) {
+            await tx.recipeIngredient.create({
+              data: {
+                recipeId: id,
+                ingredientId: ingredientId,
+                quantity: ri.quantity === '' || ri.quantity === null ? null : parseFloat(ri.quantity),
+                unit: ri.unit === '' || ri.unit === null ? null : ri.unit,
+                originalText: ri.originalText || '',
+              }
+            });
+          } else {
+            await tx.recipeIngredient.update({
+              where: { id: ri.id },
+              data: {
+                ingredientId: ingredientId,
+                quantity: ri.quantity === '' || ri.quantity === null ? null : parseFloat(ri.quantity),
+                unit: ri.unit === '' || ri.unit === null ? null : ri.unit,
+                originalText: ri.originalText,
+              }
+            });
+          }
         }
       });
       
@@ -62,10 +76,10 @@ export async function PATCH(
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const id = params.id;
+    const { id } = await params;
 
     // Delete junction records first due to foreign key constraints
     await prisma.recipeIngredient.deleteMany({
