@@ -10,11 +10,33 @@
   overflow-y: auto;
 }
 
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
 .title {
   font-size: 1.25rem;
   font-weight: 700;
   color: var(--text-color);
   letter-spacing: -0.025em;
+}
+
+.closeButton {
+  display: none;
+  background: transparent;
+  border: none;
+  font-size: 1.25rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 0.25rem;
+}
+
+@media (max-width: 768px) {
+  .closeButton {
+    display: block;
+  }
 }
 
 .recipeList {

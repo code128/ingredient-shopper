@@ -137,3 +137,43 @@
   background: var(--bg-color);
   color: var(--text-color);
 }
+
+.colName { flex: 1; }
+.colQty { width: 80px; }
+.colUnit { width: 100px; }
+.colOriginal { flex: 2; }
+
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+  }
+
+  .title {
+    font-size: 1.25rem;
+  }
+
+  .tableHeader {
+    display: none;
+  }
+
+  .ingredientList {
+    border-radius: 12px;
+    border-top: 1px solid var(--card-border);
+  }
+
+  .ingredientRow {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+    padding: 1rem;
+  }
+
+  .colName, .colQty, .colUnit, .colOriginal {
+    width: 100%;
+    flex: none;
+  }
+  
+  .actions {
+    flex-direction: column;
+  }
+}

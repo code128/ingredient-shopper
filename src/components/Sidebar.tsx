@@ -16,12 +16,20 @@ interface SidebarProps {
   activeRecipeId?: string;
   onSelectRecipe: (id: string) => void;
   onRecipeAdded: () => void;
+  onClose?: () => void;
 }
 
-export default function Sidebar({ recipes, onToggleSelection, activeRecipeId, onSelectRecipe, onRecipeAdded }: SidebarProps) {
+export default function Sidebar({ recipes, onToggleSelection, activeRecipeId, onSelectRecipe, onRecipeAdded, onClose }: SidebarProps) {
   return (
     <aside className={styles.sidebar}>
-      <h2 className={styles.title}>My Recipes</h2>
+      <div className={styles.header}>
+        <h2 className={styles.title}>My Recipes</h2>
+        {onClose && (
+          <button className={styles.closeButton} onClick={onClose} title="Close">
+            ✕
+          </button>
+        )}
+      </div>
       
       <div className={styles.recipeList}>
         {recipes.length === 0 ? (

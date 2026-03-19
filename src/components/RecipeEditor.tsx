@@ -83,16 +83,16 @@ export default function RecipeEditor({ recipe, onClose, onRecipeUpdated }: Recip
       {error && <p className={styles.errorText}>{error}</p>}
 
       <div className={styles.tableHeader}>
-        <div style={{ flex: 1 }}>Name</div>
-        <div style={{ width: '80px' }}>Qty</div>
-        <div style={{ width: '100px' }}>Unit</div>
-        <div style={{ flex: 2 }}>Original Text</div>
+        <div className={styles.colName}>Name</div>
+        <div className={styles.colQty}>Qty</div>
+        <div className={styles.colUnit}>Unit</div>
+        <div className={styles.colOriginal}>Original Text</div>
       </div>
 
       <div className={styles.ingredientList}>
         {ingredients.map(ri => (
           <div key={ri.id} className={styles.ingredientRow}>
-            <div style={{ flex: 1 }}>
+            <div className={styles.colName}>
               <input
                 type="text"
                 value={ri.name}
@@ -103,7 +103,7 @@ export default function RecipeEditor({ recipe, onClose, onRecipeUpdated }: Recip
                 style={{ fontWeight: 600 }}
               />
             </div>
-            <div style={{ width: '80px' }}>
+            <div className={styles.colQty}>
               <input
                 type="text"
                 value={ri.quantity}
@@ -113,7 +113,7 @@ export default function RecipeEditor({ recipe, onClose, onRecipeUpdated }: Recip
                 disabled={saving}
               />
             </div>
-            <div style={{ width: '100px' }}>
+            <div className={styles.colUnit}>
               <input
                 type="text"
                 value={ri.unit}
@@ -123,7 +123,7 @@ export default function RecipeEditor({ recipe, onClose, onRecipeUpdated }: Recip
                 disabled={saving}
               />
             </div>
-            <div style={{ flex: 2 }}>
+            <div className={styles.colOriginal}>
               <input
                 type="text"
                 value={ri.originalText}
