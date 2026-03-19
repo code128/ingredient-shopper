@@ -9,16 +9,22 @@ export async function PATCH(
     const body = await request.json();
     const { id } = await params;
 
-    if ('isSelected' in body) {
-      const recipe = await prisma.recipe.update({
+    const updateData: any = {};
+    if ('isSelected' in body) updateData.isSelected = body.isSelected;
+    if ('title' in body) updateData.title = body.title;
+
+    let updated = false;
+
+    if (Object.keys(updateData).length > 0) {
+      await prisma.recipe.update({
         where: { id },
-        data: { isSelected: body.isSelected },
+        data: updateData,
       });
-      return NextResponse.json({ success: true, recipe });
+      updated = true;
     }
 
     if ('ingredients' in body) {
-      const { ingredients } = body; // Array of { id, quantity, unit, originalText, name }
+      const { ingredients } = body;
       
       await prisma.$transaction(async (tx) => {
         for (const ri of ingredients) {
@@ -26,7 +32,6 @@ export async function PATCH(
           
           if (ri.name) {
             const trimmedName = ri.name.trim();
-            // Find or create ingredient
             let ingredient = await tx.ingredient.findUnique({
               where: { name: trimmedName }
             });
@@ -64,11 +69,14 @@ export async function PATCH(
           }
         }
       });
-      
-      return NextResponse.json({ success: true });
+      updated = true;
     }
 
-    return NextResponse.json({ success: false, error: 'Invalid request body' }, { status: 400 });
+    if (!updated) {
+      return NextResponse.json({ success: false, error: 'Invalid request body' }, { status: 400 });
+    }
+
+    return NextResponse.json({ success: true });
   } catch (error: any) {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }

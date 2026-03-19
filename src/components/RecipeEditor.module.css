@@ -41,6 +41,31 @@
   margin-top: 0.5rem;
 }
 
+.titleInput {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--text-color);
+  letter-spacing: -0.025em;
+  margin-top: 0.5rem;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  padding: 0.25rem 0.5rem;
+  margin-left: -0.5rem;
+  width: 100%;
+  outline: none;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.titleInput:focus {
+  border-color: var(--primary);
+  background: var(--bg-color);
+}
+
+.titleInput:hover:not(:focus) {
+  border-color: var(--card-border);
+}
+
 .errorText {
   color: #ef4444;
   font-size: 0.9rem;

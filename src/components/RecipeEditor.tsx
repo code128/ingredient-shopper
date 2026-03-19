@@ -29,6 +29,7 @@ interface RecipeEditorProps {
 }
 
 export default function RecipeEditor({ recipe, onClose, onRecipeUpdated }: RecipeEditorProps) {
+  const [title, setTitle] = useState(recipe.title);
   const [ingredients, setIngredients] = useState(() => 
     recipe.ingredients.map(ri => ({
       id: ri.id,
@@ -94,7 +95,7 @@ export default function RecipeEditor({ recipe, onClose, onRecipeUpdated }: Recip
       const res = await fetch(`/api/recipes/${recipe.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ingredients }),
+        body: JSON.stringify({ ingredients, title: title.trim() }),
       });
 
       const data = await res.json();
@@ -117,7 +118,14 @@ export default function RecipeEditor({ recipe, onClose, onRecipeUpdated }: Recip
         <button onClick={onClose} className={styles.backButton}>
           ← Back to Shopping List
         </button>
-        <h1 className={styles.title}>Edit Recipe: {recipe.title}</h1>
+        <input
+          type="text"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          className={styles.titleInput}
+          placeholder="Recipe Title"
+          disabled={saving}
+        />
       </div>
 
       {error && <p className={styles.errorText}>{error}</p>}
