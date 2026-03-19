@@ -32,6 +32,34 @@ interface ShoppingListProps {
 export default function ShoppingList({ recipes, onRecipeClick }: ShoppingListProps) {
   const selectedRecipes = recipes.filter(r => r.isSelected);
   const [categoryOrder, setCategoryOrder] = useState<string[]>([]);
+  const [shoppingMode, setShoppingMode] = useState(false);
+  const [checkedItems, setCheckedItems] = useState<Set<string>>(new Set());
+  const [manuallyOpenedCats, setManuallyOpenedCats] = useState<Set<string>>(new Set());
+
+  const toggleChecked = (cat: string, name: string) => {
+    const key = `${cat}:::${name}`;
+    setCheckedItems(prev => {
+      const next = new Set(prev);
+      if (next.has(key)) {
+        next.delete(key);
+      } else {
+        next.add(key);
+      }
+      return next;
+    });
+  };
+
+  const toggleOpenCategory = (cat: string) => {
+    setManuallyOpenedCats(prev => {
+      const next = new Set(prev);
+      if (next.has(cat)) {
+        next.delete(cat);
+      } else {
+        next.add(cat);
+      }
+      return next;
+    });
+  };
 
   useEffect(() => {
     const selectedRecipes = recipes.filter(r => r.isSelected);
@@ -134,67 +162,109 @@ export default function ShoppingList({ recipes, onRecipeClick }: ShoppingListPro
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        <h1 className={styles.title}>Shopping List</h1>
+        <div className={styles.headerTitleLine}>
+          <h1 className={styles.title}>Shopping List</h1>
+          <button 
+            className={`${styles.shoppingButton} ${shoppingMode ? styles.shoppingButtonActive : ''}`}
+            onClick={() => setShoppingMode(!shoppingMode)}
+          >
+            {shoppingMode ? 'Exit Shopping Mode' : 'Start Shopping'}
+          </button>
+        </div>
         <p className={styles.subtitle}>{selectedRecipes.length} {selectedRecipes.length === 1 ? 'recipe' : 'recipes'} selected</p>
       </div>
 
-      {displayCategories.map((cat, index) => (
-        <div key={cat} className={styles.categorySection}>
-          <h2 className={styles.categoryTitle}>
-            <span>{cat}</span>
-            <div className={styles.reorderControls}>
-              <button 
-                disabled={index === 0} 
-                onClick={() => moveCategory(cat, 'up')}
-                className={styles.reorderButton}
-                title="Move Up"
-              >
-                ↑
-              </button>
-              <button 
-                disabled={index === displayCategories.length - 1} 
-                onClick={() => moveCategory(cat, 'down')}
-                className={styles.reorderButton}
-                title="Move Down"
-              >
-                ↓
-              </button>
-            </div>
-          </h2>
-          <div className={styles.ingredientList}>
-            {Object.entries(aggregated[cat])
-              .sort((a, b) => a[0].localeCompare(b[0]))
-              .map(([name, details]) => (
-              <div key={name} className={styles.ingredientItem}>
-                <div className={styles.ingredientMain}>
-                  <span className={styles.ingredientName}>{name}</span>
-                  <div className={styles.recipeChips}>
-                    {details.recipes.map(r => (
-                      <span 
-                        key={r.id} 
-                        className={styles.chip} 
-                        title={r.title}
-                        onClick={() => onRecipeClick?.(r.id)}
-                      >
-                        {r.title.split(' ')[0]}
-                      </span>
-                    ))}
-                  </div>
+      {displayCategories.map((cat, index) => {
+        const items = Object.entries(aggregated[cat]).sort((a, b) => a[0].localeCompare(b[0]));
+        const checkedCount = items.filter(([name]) => checkedItems.has(`${cat}:::${name}`)).length;
+        const isAllChecked = items.length > 0 && checkedCount === items.length;
+        const isCollapsed = shoppingMode && isAllChecked && !manuallyOpenedCats.has(cat);
+
+        return (
+          <div key={cat} className={styles.categorySection}>
+            <h2 className={styles.categoryTitle}>
+              <span>{cat}</span>
+              {isCollapsed ? (
+                <button onClick={() => toggleOpenCategory(cat)} className={styles.expandButton}>
+                  Expand ({checkedCount} items)
+                </button>
+              ) : (
+                <div className={styles.reorderControls}>
+                  <button 
+                    disabled={index === 0} 
+                    onClick={() => moveCategory(cat, 'up')}
+                    className={styles.reorderButton}
+                    title="Move Up"
+                  >
+                    ↑
+                  </button>
+                  <button 
+                    disabled={index === displayCategories.length - 1} 
+                    onClick={() => moveCategory(cat, 'down')}
+                    className={styles.reorderButton}
+                    title="Move Down"
+                  >
+                    ↓
+                  </button>
                 </div>
-                <span className={styles.ingredientDetails}>
-                  {details.quantity > 0 ? (
-                    <span>{details.quantity} {details.unit || ''}</span>
-                  ) : (
-                    <span style={{ fontSize: '0.75rem', fontStyle: 'italic', color: 'var(--text-secondary)' }}>
-                      {details.originals[0]}
-                    </span>
-                  )}
-                </span>
+              )}
+            </h2>
+            {!isCollapsed && (
+              <div className={styles.ingredientList}>
+                {items.map(([name, details]) => {
+                  const isChecked = checkedItems.has(`${cat}:::${name}`);
+                  return (
+                    <div 
+                      key={name} 
+                      className={`${styles.ingredientItem} ${shoppingMode ? styles.shoppingModeItem : ''} ${isChecked ? styles.ingredientChecked : ''}`}
+                      onClick={() => shoppingMode && toggleChecked(cat, name)}
+                    >
+                      {shoppingMode && (
+                        <div className={styles.checkboxContainer}>
+                          <div className={`${styles.checkbox} ${isChecked ? styles.checkboxChecked : ''}`}>
+                            {isChecked && (
+                              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                              </svg>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                      <div className={styles.ingredientMain}>
+                        <span className={styles.ingredientName}>{name}</span>
+                        <div className={styles.recipeChips}>
+                          {details.recipes.map(r => (
+                            <span 
+                              key={r.id} 
+                              className={styles.chip} 
+                              title={r.title}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                onRecipeClick?.(r.id);
+                              }}
+                            >
+                              {r.title.split(' ')[0]}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                      <span className={styles.ingredientDetails}>
+                        {details.quantity > 0 ? (
+                          <span>{details.quantity} {details.unit || ''}</span>
+                        ) : (
+                          <span style={{ fontSize: '0.75rem', fontStyle: 'italic', color: 'var(--text-secondary)' }}>
+                            {details.originals[0]}
+                          </span>
+                        )}
+                      </span>
+                    </div>
+                  );
+                })}
               </div>
-            ))}
+            )}
           </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 }
