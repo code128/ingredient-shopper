@@ -55,6 +55,19 @@
   border: 1px solid var(--card-border);
   transition: all 0.2s ease;
   cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.recipeItem::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  width: 6px;
+  background-color: var(--recipe-color, transparent);
+  transition: width 0.2s ease;
 }
 
 .recipeItem:hover {
@@ -63,9 +76,17 @@
   border-color: var(--primary);
 }
 
+.recipeItem:hover::after {
+  width: 8px;
+}
+
 .recipeItemActive {
   border-color: var(--primary);
-  background: rgba(99, 102, 241, 0.05);
+  background: color-mix(in srgb, var(--recipe-color, var(--primary)) 8%, transparent);
+}
+
+.recipeItemActive::after {
+  width: 10px;
 }
 
 .checkbox {
@@ -148,4 +169,22 @@
 
 .authButton:hover {
   background: rgba(99, 102, 241, 0.05);
+}
+
+.feedbackContainer {
+  margin-top: auto;
+  text-align: center;
+  padding-top: 1rem;
+}
+
+.feedbackLink {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.feedbackLink:hover {
+  text-decoration: underline;
+  color: var(--primary);
 }

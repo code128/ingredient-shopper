@@ -63,7 +63,7 @@ export default function Sidebar({ recipes, onToggleSelection, activeRecipeId, on
             <div
               key={recipe.id}
               className={`${styles.recipeItem} ${activeRecipeId === recipe.id ? styles.recipeItemActive : ''}`}
-              style={recipe.colorIndex ? { borderLeft: `6px solid var(--palette-${recipe.colorIndex})`, paddingLeft: '0.5rem' } : {}}
+              style={recipe.colorIndex ? { '--recipe-color': `var(--palette-${recipe.colorIndex})` } as React.CSSProperties : {}}
               onClick={() => onSelectRecipe(recipe.id)}
             >
               <div
@@ -85,6 +85,15 @@ export default function Sidebar({ recipes, onToggleSelection, activeRecipeId, on
         )}
       </div>
       {session && <AddRecipeForm onRecipeAdded={onRecipeAdded} />}
+      
+      <div className={styles.feedbackContainer}>
+        <a 
+          href="mailto:joshbloom@google.com?subject=Recipe%20Ingredient%20Shopper%20Feedback" 
+          className={styles.feedbackLink}
+        >
+          Send Feedback
+        </a>
+      </div>
     </aside>
   );
 }
