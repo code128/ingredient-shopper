@@ -103,7 +103,7 @@ export default function Home() {
               onRecipeUpdated={fetchRecipes}
             />
           ) : (
-            <ShoppingList recipes={recipes} />
+            <ShoppingList recipes={recipes} onRecipeClick={handleSelectRecipe} />
           )}
         </div>
       </div>

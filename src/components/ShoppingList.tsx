@@ -26,9 +26,10 @@ interface Recipe {
 
 interface ShoppingListProps {
   recipes: Recipe[];
+  onRecipeClick?: (id: string) => void;
 }
 
-export default function ShoppingList({ recipes }: ShoppingListProps) {
+export default function ShoppingList({ recipes, onRecipeClick }: ShoppingListProps) {
   const selectedRecipes = recipes.filter(r => r.isSelected);
   const [categoryOrder, setCategoryOrder] = useState<string[]>([]);
 
@@ -169,7 +170,12 @@ export default function ShoppingList({ recipes }: ShoppingListProps) {
                   <span className={styles.ingredientName}>{name}</span>
                   <div className={styles.recipeChips}>
                     {details.recipes.map(r => (
-                      <span key={r.id} className={styles.chip} title={r.title}>
+                      <span 
+                        key={r.id} 
+                        className={styles.chip} 
+                        title={r.title}
+                        onClick={() => onRecipeClick?.(r.id)}
+                      >
                         {r.title.split(' ')[0]}
                       </span>
                     ))}
