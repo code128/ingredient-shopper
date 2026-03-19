@@ -72,6 +72,20 @@
   margin-left: 0.5rem;
 }
 
+.collapsibleWrapper {
+  display: grid;
+  grid-template-rows: 1fr;
+  transition: grid-template-rows 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.listCollapsed {
+  grid-template-rows: 0fr;
+}
+
+.listInner {
+  overflow: hidden;
+}
+
 .ingredientList {
   display: flex;
   flex-direction: column;

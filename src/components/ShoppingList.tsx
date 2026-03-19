@@ -225,9 +225,10 @@ export default function ShoppingList({ recipes, onRecipeClick }: ShoppingListPro
                 </div>
               )}
             </h2>
-            {!isCollapsed && (
-              <div className={styles.ingredientList}>
-                {items.map(([name, details]) => {
+            <div className={`${styles.collapsibleWrapper} ${isCollapsed ? styles.listCollapsed : ''}`}>
+              <div className={styles.listInner}>
+                <div className={styles.ingredientList}>
+                  {items.map(([name, details]) => {
                   const isChecked = checkedItems.has(`${cat}:::${name}`);
                   return (
                     <div 
@@ -276,8 +277,9 @@ export default function ShoppingList({ recipes, onRecipeClick }: ShoppingListPro
                     </div>
                   );
                 })}
+                </div>
               </div>
-            )}
+            </div>
           </div>
         );
       })}
