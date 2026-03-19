@@ -1,11 +1,17 @@
 import { NextResponse } from 'next/server';
 import { GoogleGenAI } from '@google/genai';
 import prisma from '@/lib/prisma';
+import { auth } from '@/auth';
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 export async function POST(request: Request) {
   try {
+    const session = await auth();
+    if (!session?.user?.id) {
+      return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
+    }
+
     const { image, mimeType } = await request.json();
     
     if (!image) {
@@ -66,6 +72,7 @@ export async function POST(request: Request) {
       data: {
         title: parsed.title,
         sourceUrl: 'Uploaded Image',
+        userId: session.user.id,
         ingredients: {
           create: parsed.ingredients.map((ing: any) => ({
             quantity: ing.quantity || null,

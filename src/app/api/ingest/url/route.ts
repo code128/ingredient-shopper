@@ -2,11 +2,17 @@ import { NextResponse } from 'next/server';
 import { GoogleGenAI } from '@google/genai';
 import * as cheerio from 'cheerio';
 import prisma from '@/lib/prisma';
+import { auth } from '@/auth';
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 export async function POST(request: Request) {
   try {
+    const session = await auth();
+    if (!session?.user?.id) {
+      return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
+    }
+
     const { url } = await request.json();
     if (!url) {
       return NextResponse.json({ error: 'URL is required' }, { status: 400 });
@@ -75,6 +81,7 @@ export async function POST(request: Request) {
       data: {
         title: parsed.title,
         sourceUrl: url,
+        userId: session.user.id,
         ingredients: {
           create: parsed.ingredients.map((ing: any) => ({
             quantity: ing.quantity || null,

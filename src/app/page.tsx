@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import { useSession } from "next-auth/react";
 import Sidebar from '@/components/Sidebar';
 import ShoppingList from '@/components/ShoppingList';
 import RecipeEditor from '@/components/RecipeEditor';
@@ -28,12 +29,19 @@ interface Recipe {
 }
 
 export default function Home() {
+  const { data: session, status } = useSession();
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [activeRecipeId, setActiveRecipeId] = useState<string | undefined>();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [loading, setLoading] = useState(true);
 
   const fetchRecipes = async () => {
+    if (!session?.user) {
+      setRecipes([]);
+      setLoading(false);
+      return;
+    }
+
     try {
       const res = await fetch('/api/recipes');
       const data = await res.json();
@@ -49,7 +57,7 @@ export default function Home() {
 
   useEffect(() => {
     fetchRecipes();
-  }, []);
+  }, [session]);
 
   const handleToggleSelection = (id: string) => {
     setRecipes(prev => prev.map(r => r.id === id ? { ...r, isSelected: !r.isSelected } : r));
@@ -62,7 +70,7 @@ export default function Home() {
 
   const activeRecipe = recipes.find(r => r.id === activeRecipeId);
 
-  if (loading) {
+  if (loading || status === 'loading') {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', color: 'var(--primary)', fontWeight: 600 }}>
         Loading Dashboard...
@@ -95,7 +103,12 @@ export default function Home() {
           </button>
         )}
         <div className={stylesLayout.scrollArea}>
-          {activeRecipe ? (
+          {status === 'unauthenticated' ? (
+            <div style={{ display: 'flex', justifyContent: 'center', flexDirection: 'column', alignItems: 'center', height: '100%', color: 'var(--text-secondary)', textAlign: 'center' }}>
+              <h2 style={{ fontSize: '1.5rem', marginBottom: '1rem', color: 'var(--text-color)' }}>Welcome to Ingredient Shopper</h2>
+              <p>Please sign in using the sidebar to view and manage your recipes.</p>
+            </div>
+          ) : activeRecipe ? (
             <RecipeEditor 
               key={activeRecipe.id}
               recipe={activeRecipe}

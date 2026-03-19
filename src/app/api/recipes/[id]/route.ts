@@ -1,13 +1,24 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { auth } from '@/auth';
 
 export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const body = await request.json();
+    const session = await auth();
+    if (!session?.user?.id) {
+      return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
+    }
+
     const { id } = await params;
+    const existingRecipe = await prisma.recipe.findUnique({ where: { id } });
+    if (!existingRecipe || existingRecipe.userId !== session.user.id) {
+      return NextResponse.json({ success: false, error: 'Forbidden' }, { status: 403 });
+    }
+
+    const body = await request.json();
 
     const updateData: any = {};
     if ('isSelected' in body) updateData.isSelected = body.isSelected;
@@ -87,7 +98,16 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const session = await auth();
+    if (!session?.user?.id) {
+      return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
+    }
+
     const { id } = await params;
+    const existingRecipe = await prisma.recipe.findUnique({ where: { id } });
+    if (!existingRecipe || existingRecipe.userId !== session.user.id) {
+      return NextResponse.json({ success: false, error: 'Forbidden' }, { status: 403 });
+    }
 
     // Delete junction records first due to foreign key constraints
     await prisma.recipeIngredient.deleteMany({

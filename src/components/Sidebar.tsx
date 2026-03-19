@@ -38,7 +38,7 @@ export default function Sidebar({ recipes, onToggleSelection, activeRecipeId, on
         {session ? (
           <div className={styles.userInfo}>
             {session.user?.image && (
-              <img src={session.user.image} alt="Profile" className={styles.avatar} />
+              <img src={session.user.image} alt="Profile" className={styles.avatar} referrerPolicy="no-referrer" />
             )}
             <div className={styles.userMeta}>
               <span className={styles.userName}>{session.user?.name || 'User'}</span>
@@ -82,7 +82,7 @@ export default function Sidebar({ recipes, onToggleSelection, activeRecipeId, on
           ))
         )}
       </div>
-      <AddRecipeForm onRecipeAdded={onRecipeAdded} />
+      {session && <AddRecipeForm onRecipeAdded={onRecipeAdded} />}
     </aside>
   );
 }
