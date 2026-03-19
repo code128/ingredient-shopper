@@ -43,6 +43,35 @@
   gap: 0.5rem;
 }
 
+.collapsibleTitle {
+  cursor: pointer;
+  user-select: none;
+}
+
+.collapsibleTitle:hover {
+  opacity: 0.8;
+}
+
+.chevron {
+  font-size: 0.75rem;
+  transition: transform 0.2s ease;
+  transform: rotate(90deg);
+  display: inline-block;
+  width: 12px;
+  color: var(--text-secondary);
+}
+
+.chevronCollapsed {
+  transform: rotate(0deg);
+}
+
+.collapsedCount {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  font-weight: 400;
+  margin-left: 0.5rem;
+}
+
 .ingredientList {
   display: flex;
   flex-direction: column;

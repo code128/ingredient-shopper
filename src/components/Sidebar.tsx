@@ -3,6 +3,7 @@
 import React from 'react';
 import styles from './Sidebar.module.css';
 import AddRecipeForm from './AddRecipeForm';
+import { useSession, signIn, signOut } from "next-auth/react";
 
 interface Recipe {
   id: string;
@@ -20,6 +21,8 @@ interface SidebarProps {
 }
 
 export default function Sidebar({ recipes, onToggleSelection, activeRecipeId, onSelectRecipe, onRecipeAdded, onClose }: SidebarProps) {
+  const { data: session } = useSession();
+
   return (
     <aside className={styles.sidebar}>
       <div className={styles.header}>
@@ -27,6 +30,24 @@ export default function Sidebar({ recipes, onToggleSelection, activeRecipeId, on
         {onClose && (
           <button className={styles.closeButton} onClick={onClose} title="Close">
             ✕
+          </button>
+        )}
+      </div>
+      
+      <div className={styles.authSection}>
+        {session ? (
+          <div className={styles.userInfo}>
+            {session.user?.image && (
+              <img src={session.user.image} alt="Profile" className={styles.avatar} />
+            )}
+            <div className={styles.userMeta}>
+              <span className={styles.userName}>{session.user?.name || 'User'}</span>
+              <button className={styles.authButton} onClick={() => signOut()}>Sign Out</button>
+            </div>
+          </div>
+        ) : (
+          <button className={styles.authButton} onClick={() => signIn('google')}>
+            Sign in with Google
           </button>
         )}
       </div>

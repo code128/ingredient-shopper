@@ -35,6 +35,18 @@ export default function ShoppingList({ recipes, onRecipeClick }: ShoppingListPro
   const [shoppingMode, setShoppingMode] = useState(false);
   const [checkedItems, setCheckedItems] = useState<Set<string>>(new Set());
   const [manuallyOpenedCats, setManuallyOpenedCats] = useState<Set<string>>(new Set());
+  const [manuallyCollapsedCats, setManuallyCollapsedCats] = useState<Set<string>>(new Set());
+
+  const handleToggleCollapse = (cat: string, isCollapsed: boolean, isAutoCollapsed: boolean) => {
+    if (isCollapsed) {
+      if (isAutoCollapsed) {
+        setManuallyOpenedCats(prev => { const n = new Set(prev); n.add(cat); return n; });
+      }
+      setManuallyCollapsedCats(prev => { const n = new Set(prev); n.delete(cat); return n; });
+    } else {
+      setManuallyCollapsedCats(prev => { const n = new Set(prev); n.add(cat); return n; });
+    }
+  };
 
   const toggleChecked = (cat: string, name: string) => {
     const key = `${cat}:::${name}`;
@@ -178,18 +190,22 @@ export default function ShoppingList({ recipes, onRecipeClick }: ShoppingListPro
         const items = Object.entries(aggregated[cat]).sort((a, b) => a[0].localeCompare(b[0]));
         const checkedCount = items.filter(([name]) => checkedItems.has(`${cat}:::${name}`)).length;
         const isAllChecked = items.length > 0 && checkedCount === items.length;
-        const isCollapsed = shoppingMode && isAllChecked && !manuallyOpenedCats.has(cat);
+        const isAutoCollapsed = shoppingMode && isAllChecked && !manuallyOpenedCats.has(cat);
+        const isCollapsed = manuallyCollapsedCats.has(cat) || isAutoCollapsed;
 
         return (
           <div key={cat} className={styles.categorySection}>
-            <h2 className={styles.categoryTitle}>
+            <h2 
+              className={`${styles.categoryTitle} ${styles.collapsibleTitle}`}
+              onClick={() => handleToggleCollapse(cat, isCollapsed, isAutoCollapsed)}
+            >
+              <span className={`${styles.chevron} ${isCollapsed ? styles.chevronCollapsed : ''}`}>▶</span>
               <span>{cat}</span>
-              {isCollapsed ? (
-                <button onClick={() => toggleOpenCategory(cat)} className={styles.expandButton}>
-                  Expand ({checkedCount} items)
-                </button>
-              ) : (
-                <div className={styles.reorderControls}>
+              {isCollapsed && (
+                <span className={styles.collapsedCount}>({items.length} {items.length === 1 ? 'item' : 'items'})</span>
+              )}
+              {!isCollapsed && (
+                <div className={styles.reorderControls} onClick={(e) => e.stopPropagation()}>
                   <button 
                     disabled={index === 0} 
                     onClick={() => moveCategory(cat, 'up')}
