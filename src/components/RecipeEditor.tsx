@@ -59,6 +59,33 @@ export default function RecipeEditor({ recipe, onClose, onRecipeUpdated }: Recip
     ]);
   };
 
+  const handleDelete = async () => {
+    if (!window.confirm('Are you sure you want to delete this recipe? This action cannot be undone.')) {
+      return;
+    }
+
+    setSaving(true);
+    setError(null);
+
+    try {
+      const res = await fetch(`/api/recipes/${recipe.id}`, {
+        method: 'DELETE',
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        onRecipeUpdated();
+        onClose();
+      } else {
+        setError(data.error || 'Failed to delete recipe');
+      }
+    } catch (err) {
+      setError('An error occurred while deleting');
+    } finally {
+      setSaving(false);
+    }
+  };
+
   const handleSave = async () => {
     setSaving(true);
     setError(null);
@@ -161,6 +188,9 @@ export default function RecipeEditor({ recipe, onClose, onRecipeUpdated }: Recip
       <div className={styles.actions}>
         <button onClick={handleSave} className={styles.saveButton} disabled={saving}>
           {saving ? 'Saving...' : 'Save Changes'}
+        </button>
+        <button onClick={handleDelete} className={styles.deleteButton} disabled={saving}>
+          Delete Recipe
         </button>
         <button onClick={onClose} className={styles.cancelButton} disabled={saving}>
           Cancel
