@@ -65,7 +65,7 @@
   border: 1px solid var(--card-border);
   border-top: none;
   border-radius: 0 0 12px 12px;
-  background: white;
+  background: var(--sidebar-bg);
 }
 
 .ingredientRow {

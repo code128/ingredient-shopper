@@ -35,7 +35,9 @@ export default function Sidebar({ recipes, onToggleSelection, activeRecipeId, on
         {recipes.length === 0 ? (
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>No recipes added yet.</p>
         ) : (
-          recipes.map((recipe) => (
+          [...recipes]
+            .sort((a, b) => a.title.localeCompare(b.title))
+            .map((recipe) => (
             <div
               key={recipe.id}
               className={`${styles.recipeItem} ${activeRecipeId === recipe.id ? styles.recipeItemActive : ''}`}
