@@ -185,21 +185,21 @@
   font-size: 0.65rem;
   padding: 0.15rem 0.4rem;
   border-radius: 6px;
-  background: rgba(99, 102, 241, 0.1);
-  color: var(--primary);
+  background: color-mix(in srgb, var(--chip-color, var(--primary)) 15%, transparent);
+  color: var(--chip-color, var(--primary));
   font-weight: 600;
   text-transform: capitalize;
-  border: 1px solid rgba(99, 102, 241, 0.2);
+  border: 1px solid color-mix(in srgb, var(--chip-color, var(--primary)) 30%, transparent);
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .chip:hover {
-  background: var(--primary);
+  background: var(--chip-color, var(--primary));
   color: white;
-  border-color: var(--primary);
+  border-color: var(--chip-color, var(--primary));
   transform: translateY(-1px);
-  box-shadow: 0 2px 4px rgba(99, 102, 241, 0.1);
+  box-shadow: 0 2px 4px color-mix(in srgb, var(--chip-color, var(--primary)) 10%, transparent);
 }
 
 .shoppingButton {

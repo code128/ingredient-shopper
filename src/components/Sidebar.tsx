@@ -9,6 +9,7 @@ interface Recipe {
   id: string;
   title: string;
   isSelected: boolean;
+  colorIndex?: number;
 }
 
 interface SidebarProps {
@@ -62,6 +63,7 @@ export default function Sidebar({ recipes, onToggleSelection, activeRecipeId, on
             <div
               key={recipe.id}
               className={`${styles.recipeItem} ${activeRecipeId === recipe.id ? styles.recipeItemActive : ''}`}
+              style={recipe.colorIndex ? { borderLeft: `6px solid var(--palette-${recipe.colorIndex})`, paddingLeft: '0.5rem' } : {}}
               onClick={() => onSelectRecipe(recipe.id)}
             >
               <div

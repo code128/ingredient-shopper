@@ -15,6 +15,13 @@
   --glass-border: rgba(255, 255, 255, 0.5);
   --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
   --radius: 16px;
+
+  --palette-1: #f43f5e;
+  --palette-2: #3b82f6;
+  --palette-3: #10b981;
+  --palette-4: #f59e0b;
+  --palette-5: #8b5cf6;
+  --palette-6: #06b6d4;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -30,6 +37,13 @@
     --sidebar-border: #334155;
     --glass-bg: rgba(30, 41, 59, 0.7);
     --glass-border: rgba(255, 255, 255, 0.08);
+
+    --palette-1: #fb7185;
+    --palette-2: #60a5fa;
+    --palette-3: #34d399;
+    --palette-4: #fbbf24;
+    --palette-5: #a78bfa;
+    --palette-6: #22d3ee;
   }
 }
 

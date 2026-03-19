@@ -21,6 +21,7 @@ interface Recipe {
   id: string;
   title: string;
   isSelected: boolean;
+  colorIndex: number;
   ingredients: RecipeIngredient[];
 }
 
@@ -133,7 +134,7 @@ export default function ShoppingList({ recipes, onRecipeClick }: ShoppingListPro
         quantity: number; 
         unit: string | null; 
         originals: string[];
-        recipes: { id: string; title: string }[];
+        recipes: { id: string; title: string; colorIndex: number }[];
       } 
     } 
   } = {};
@@ -162,7 +163,7 @@ export default function ShoppingList({ recipes, onRecipeClick }: ShoppingListPro
       current.originals.push(ri.originalText);
       
       if (!current.recipes.some(r => r.id === recipe.id)) {
-        current.recipes.push({ id: recipe.id, title: recipe.title });
+        current.recipes.push({ id: recipe.id, title: recipe.title, colorIndex: recipe.colorIndex });
       }
     });
   });
@@ -255,6 +256,7 @@ export default function ShoppingList({ recipes, onRecipeClick }: ShoppingListPro
                               key={r.id} 
                               className={styles.chip} 
                               title={r.title}
+                              style={{ '--chip-color': `var(--palette-${r.colorIndex})` } as React.CSSProperties}
                               onClick={(e) => {
                                 e.stopPropagation();
                                 onRecipeClick?.(r.id);

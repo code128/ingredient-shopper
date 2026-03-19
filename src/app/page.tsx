@@ -25,6 +25,7 @@ interface Recipe {
   id: string;
   title: string;
   isSelected: boolean;
+  colorIndex: number;
   ingredients: RecipeIngredient[];
 }
 
@@ -40,7 +41,10 @@ export default function Home() {
       const res = await fetch('/api/recipes');
       const data = await res.json();
       if (data.success) {
-        setRecipes(data.recipes);
+        setRecipes(data.recipes.map((r: any, i: number) => ({
+          ...r,
+          colorIndex: (i % 6) + 1
+        })));
       }
     } catch (error) {
       console.error('Failed to fetch recipes:', error);

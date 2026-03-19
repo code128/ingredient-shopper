@@ -46,6 +46,7 @@ export default function RecipeEditor({ recipe, onClose, onRecipeUpdated }: Recip
   
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const handleFieldChange = (id: string, field: string, value: string) => {
     setIngredients(prev => prev.map(ri => ri.id === id ? { ...ri, [field]: value } : ri));
@@ -64,13 +65,11 @@ export default function RecipeEditor({ recipe, onClose, onRecipeUpdated }: Recip
     ]);
   };
 
-  const handleDelete = async () => {
-    if (!window.confirm('Are you sure you want to delete this recipe? This action cannot be undone.')) {
-      return;
-    }
+  const handleDelete = () => {
+    setShowDeleteConfirm(true);
+  };
 
-    setSaving(true);
-    setError(null);
+  const executeDelete = async () => {
 
     try {
       const res = await fetch(`/api/recipes/${recipe.id}`, {
@@ -214,6 +213,34 @@ export default function RecipeEditor({ recipe, onClose, onRecipeUpdated }: Recip
           {isReadOnly ? 'Close' : 'Cancel'}
         </button>
       </div>
+
+      {showDeleteConfirm && (
+        <div className={styles.modalOverlay}>
+          <div className={styles.modalContent}>
+            <h3 className={styles.modalTitle}>Delete Recipe</h3>
+            <p className={styles.modalDescription}>
+              Are you sure you want to completely delete <strong>{recipe.title}</strong>?<br/>
+              This action cannot be undone.
+            </p>
+            <div className={styles.modalActions}>
+              <button 
+                onClick={executeDelete} 
+                className={styles.deleteButton}
+                disabled={saving}
+              >
+                {saving ? 'Deleting...' : 'Yes, Delete'}
+              </button>
+              <button 
+                onClick={() => setShowDeleteConfirm(false)} 
+                className={styles.cancelButton}
+                disabled={saving}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

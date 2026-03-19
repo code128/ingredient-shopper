@@ -44,47 +44,59 @@ export default function AddRecipeForm({ onRecipeAdded }: AddRecipeFormProps) {
     }
   };
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setImageFile(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
+  const processFile = (file?: File) => {
+    if (!file) return;
 
-  const handleImageSubmit = async () => {
-    if (!imagePreview) return;
-
+    setImageFile(file);
     setLoading(true);
     setError(null);
 
-    try {
-      const res = await fetch('/api/ingest/image', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          image: imagePreview,
-          mimeType: imageFile?.type || 'image/jpeg'
-        }),
-      });
+    const reader = new FileReader();
+    reader.onloadend = async () => {
+      const base64Image = reader.result as string;
+      setImagePreview(base64Image);
+      
+      try {
+        const res = await fetch('/api/ingest/image', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            image: base64Image,
+            mimeType: file.type || 'image/jpeg'
+          }),
+        });
 
-      const data = await res.json();
-      if (data.success) {
-        setImageFile(null);
+        const data = await res.json();
+        if (data.success) {
+          setImageFile(null);
+          setImagePreview(null);
+          onRecipeAdded();
+        } else {
+          setError(data.error || 'Failed to process image');
+          setImagePreview(null);
+        }
+      } catch (err) {
+        setError('An error occurred while processing image');
         setImagePreview(null);
-        onRecipeAdded();
-      } else {
-        setError(data.error || 'Failed to process image');
+      } finally {
+        setLoading(false);
       }
-    } catch (err) {
-      setError('An error occurred while processing image');
-    } finally {
-      setLoading(false);
-    }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    processFile(e.target.files?.[0]);
+    e.target.value = '';
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    processFile(e.dataTransfer.files?.[0]);
   };
 
   return (
@@ -123,7 +135,11 @@ export default function AddRecipeForm({ onRecipeAdded }: AddRecipeFormProps) {
         </form>
       ) : (
         <div>
-          <label className={styles.imageUploadArea}>
+          <label 
+            className={styles.imageUploadArea}
+            onDragOver={handleDragOver}
+            onDrop={handleDrop}
+          >
             <input 
               type="file" 
               accept="image/*" 
@@ -132,22 +148,9 @@ export default function AddRecipeForm({ onRecipeAdded }: AddRecipeFormProps) {
               disabled={loading}
             />
             <div>
-              {imagePreview ? 'Change Image' : 'Click or Drag to Upload Recipe Image'}
+              {loading ? 'Processing Image...' : 'Click or Drag to Upload Recipe Image'}
             </div>
           </label>
-          {imagePreview && (
-            <div>
-              <img src={imagePreview} alt="Preview" className={styles.preview} />
-              <button 
-                onClick={handleImageSubmit} 
-                className={styles.button} 
-                style={{ marginTop: '1rem', width: '100%' }}
-                disabled={loading}
-              >
-                {loading ? 'Processing...' : 'Process Image'}
-              </button>
-            </div>
-          )}
         </div>
       )}
       
