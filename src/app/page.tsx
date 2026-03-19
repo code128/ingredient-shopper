@@ -36,12 +36,6 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
 
   const fetchRecipes = async () => {
-    if (!session?.user) {
-      setRecipes([]);
-      setLoading(false);
-      return;
-    }
-
     try {
       const res = await fetch('/api/recipes');
       const data = await res.json();
@@ -103,12 +97,7 @@ export default function Home() {
           </button>
         )}
         <div className={stylesLayout.scrollArea}>
-          {status === 'unauthenticated' ? (
-            <div style={{ display: 'flex', justifyContent: 'center', flexDirection: 'column', alignItems: 'center', height: '100%', color: 'var(--text-secondary)', textAlign: 'center' }}>
-              <h2 style={{ fontSize: '1.5rem', marginBottom: '1rem', color: 'var(--text-color)' }}>Welcome to Ingredient Shopper</h2>
-              <p>Please sign in using the sidebar to view and manage your recipes.</p>
-            </div>
-          ) : activeRecipe ? (
+          {activeRecipe ? (
             <RecipeEditor 
               key={activeRecipe.id}
               recipe={activeRecipe}

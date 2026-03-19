@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useSession } from "next-auth/react";
 import styles from './RecipeEditor.module.css';
 
 interface Ingredient {
@@ -29,6 +30,9 @@ interface RecipeEditorProps {
 }
 
 export default function RecipeEditor({ recipe, onClose, onRecipeUpdated }: RecipeEditorProps) {
+  const { data: session } = useSession();
+  const isReadOnly = !session?.user;
+
   const [title, setTitle] = useState(recipe.title);
   const [ingredients, setIngredients] = useState(() => 
     recipe.ingredients.map(ri => ({
@@ -124,7 +128,7 @@ export default function RecipeEditor({ recipe, onClose, onRecipeUpdated }: Recip
           onChange={(e) => setTitle(e.target.value)}
           className={styles.titleInput}
           placeholder="Recipe Title"
-          disabled={saving}
+          disabled={saving || isReadOnly}
         />
       </div>
 
@@ -147,7 +151,7 @@ export default function RecipeEditor({ recipe, onClose, onRecipeUpdated }: Recip
                 onChange={(e) => handleFieldChange(ri.id, 'name', e.target.value)}
                 placeholder="Ingredient Name"
                 className={styles.input}
-                disabled={saving}
+                disabled={saving || isReadOnly}
                 style={{ fontWeight: 600 }}
               />
             </div>
@@ -158,7 +162,7 @@ export default function RecipeEditor({ recipe, onClose, onRecipeUpdated }: Recip
                 onChange={(e) => handleFieldChange(ri.id, 'quantity', e.target.value)}
                 placeholder="Qty"
                 className={styles.input}
-                disabled={saving}
+                disabled={saving || isReadOnly}
               />
             </div>
             <div className={styles.colUnit}>
@@ -168,7 +172,7 @@ export default function RecipeEditor({ recipe, onClose, onRecipeUpdated }: Recip
                 onChange={(e) => handleFieldChange(ri.id, 'unit', e.target.value)}
                 placeholder="Unit"
                 className={styles.input}
-                disabled={saving}
+                disabled={saving || isReadOnly}
               />
             </div>
             <div className={styles.colOriginal}>
@@ -178,30 +182,36 @@ export default function RecipeEditor({ recipe, onClose, onRecipeUpdated }: Recip
                 onChange={(e) => handleFieldChange(ri.id, 'originalText', e.target.value)}
                 placeholder="Original description"
                 className={styles.input}
-                disabled={saving}
+                disabled={saving || isReadOnly}
               />
             </div>
           </div>
         ))}
       </div>
 
-      <button 
-        onClick={handleAddIngredient} 
-        className={styles.addButton} 
-        disabled={saving}
-      >
-        + Add Ingredient
-      </button>
+      {!isReadOnly && (
+        <button 
+          onClick={handleAddIngredient} 
+          className={styles.addButton} 
+          disabled={saving}
+        >
+          + Add Ingredient
+        </button>
+      )}
 
       <div className={styles.actions}>
-        <button onClick={handleSave} className={styles.saveButton} disabled={saving}>
-          {saving ? 'Saving...' : 'Save Changes'}
-        </button>
-        <button onClick={handleDelete} className={styles.deleteButton} disabled={saving}>
-          Delete Recipe
-        </button>
+        {!isReadOnly && (
+          <button onClick={handleSave} className={styles.saveButton} disabled={saving}>
+            {saving ? 'Saving...' : 'Save Changes'}
+          </button>
+        )}
+        {!isReadOnly && (
+          <button onClick={handleDelete} className={styles.deleteButton} disabled={saving}>
+            Delete Recipe
+          </button>
+        )}
         <button onClick={onClose} className={styles.cancelButton} disabled={saving}>
-          Cancel
+          {isReadOnly ? 'Close' : 'Cancel'}
         </button>
       </div>
     </div>

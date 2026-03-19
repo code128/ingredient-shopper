@@ -19,4 +19,33 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       return session;
     },
   },
+  events: {
+    async createUser({ user }) {
+      if (!user.id) return;
+      
+      const defaults = await prisma.recipe.findMany({
+        where: { userId: null },
+        include: { ingredients: true }
+      });
+
+      for (const def of defaults) {
+        await prisma.recipe.create({
+          data: {
+            title: def.title,
+            sourceUrl: def.sourceUrl,
+            imageUrl: def.imageUrl,
+            userId: user.id,
+            ingredients: {
+              create: def.ingredients.map(ing => ({
+                quantity: ing.quantity,
+                unit: ing.unit,
+                originalText: ing.originalText,
+                ingredientId: ing.ingredientId
+              }))
+            }
+          }
+        });
+      }
+    }
+  }
 })
