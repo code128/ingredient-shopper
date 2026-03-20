@@ -5,6 +5,7 @@ import Resend from "next-auth/providers/resend"
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   adapter: PrismaAdapter(prisma),
+  secret: process.env.AUTH_SECRET,
   providers: [
     Resend({
       from: process.env.EMAIL_FROM,

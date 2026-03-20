@@ -59,7 +59,7 @@ export default function Sidebar({ recipes, onToggleSelection, activeRecipeId, on
               <img src={session.user.image} alt="Profile" className={styles.avatar} referrerPolicy="no-referrer" />
             )}
             <div className={styles.userMeta}>
-              <span className={styles.userName}>{session.user?.name || 'User'}</span>
+              <span className={styles.userName}>{session.user?.name || session.user?.email || 'User'}</span>
               <button className={styles.authButton} onClick={() => signOut()}>Sign Out</button>
             </div>
           </div>
