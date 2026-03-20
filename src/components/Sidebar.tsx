@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import styles from './Sidebar.module.css';
 import AddRecipeForm from './AddRecipeForm';
 import { useSession, signIn, signOut } from "next-auth/react";
@@ -23,6 +23,23 @@ interface SidebarProps {
 
 export default function Sidebar({ recipes, onToggleSelection, activeRecipeId, onSelectRecipe, onRecipeAdded, onClose }: SidebarProps) {
   const { data: session } = useSession();
+  const [email, setEmail] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [emailSent, setEmailSent] = useState(false);
+
+  const handleEmailSignIn = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email) return;
+    setIsSubmitting(true);
+    try {
+      await signIn('resend', { email, redirect: false });
+      setEmailSent(true);
+    } catch (error) {
+      console.error("Sign in failed:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <aside className={styles.sidebar}>
@@ -47,9 +64,29 @@ export default function Sidebar({ recipes, onToggleSelection, activeRecipeId, on
             </div>
           </div>
         ) : (
-          <button className={styles.authButton} onClick={() => signIn('google')}>
-            Sign in with Google
-          </button>
+          <div className={styles.emailAuthContainer}>
+            {emailSent ? (
+               <div className={styles.emailSentMsg}>
+                 <p>Link sent! ✨</p>
+                 <span>Check your inbox to sign in.</span>
+               </div>
+            ) : (
+              <form onSubmit={handleEmailSignIn} className={styles.emailForm}>
+                <input 
+                  type="email" 
+                  placeholder="Email address" 
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className={styles.emailInput}
+                  required
+                  disabled={isSubmitting}
+                />
+                <button type="submit" className={styles.authButton} disabled={isSubmitting}>
+                  {isSubmitting ? 'Sending Link...' : 'Sign in with Email'}
+                </button>
+              </form>
+            )}
+          </div>
         )}
       </div>
       

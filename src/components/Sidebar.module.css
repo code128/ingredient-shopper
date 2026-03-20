@@ -171,6 +171,60 @@
   background: rgba(99, 102, 241, 0.05);
 }
 
+.emailAuthContainer {
+  margin-top: 0.25rem;
+}
+
+.emailForm {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.emailInput {
+  width: 100%;
+  padding: 0.6rem 0.75rem;
+  border-radius: 8px;
+  border: 1px solid var(--card-border);
+  background: var(--bg-color);
+  color: var(--text-color);
+  font-size: 0.85rem;
+  transition: all 0.2s;
+}
+
+.emailInput:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary) 20%, transparent);
+}
+
+.emailInput:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.emailSentMsg {
+  text-align: center;
+  padding: 1rem 0.5rem;
+  background: var(--bg-color);
+  border-radius: 8px;
+  border: 1px dashed var(--primary);
+}
+
+.emailSentMsg p {
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin: 0 0 0.25rem 0;
+  color: var(--primary);
+}
+
+.emailSentMsg span {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  line-height: 1.3;
+  display: block;
+}
+
 .feedbackContainer {
   margin-top: auto;
   text-align: center;
