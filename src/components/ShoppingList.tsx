@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import styles from './ShoppingList.module.css';
 
 interface Ingredient {
@@ -240,11 +241,19 @@ export default function ShoppingList({ recipes, onRecipeClick }: ShoppingListPro
                       {shoppingMode && (
                         <div className={styles.checkboxContainer}>
                           <div className={`${styles.checkbox} ${isChecked ? styles.checkboxChecked : ''}`}>
-                            {isChecked && (
-                              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                                <polyline points="20 6 9 17 4 12"></polyline>
-                              </svg>
-                            )}
+                            <AnimatePresence>
+                              {isChecked && (
+                                <motion.svg 
+                                  initial={{ scale: 0.5, opacity: 0 }}
+                                  animate={{ scale: 1, opacity: 1 }}
+                                  exit={{ scale: 0.5, opacity: 0 }}
+                                  transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                                  xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"
+                                >
+                                  <polyline points="20 6 9 17 4 12"></polyline>
+                                </motion.svg>
+                              )}
+                            </AnimatePresence>
                           </div>
                         </div>
                       )}

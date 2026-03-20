@@ -72,7 +72,7 @@
 
 .recipeItem:hover {
   transform: translateY(-2px);
-  box-shadow: var(--shadow);
+  box-shadow: 0 0 12px var(--primary-glow);
   border-color: var(--primary);
 }
 
@@ -82,7 +82,8 @@
 
 .recipeItemActive {
   border-color: var(--primary);
-  background: color-mix(in srgb, var(--recipe-color, var(--primary)) 8%, transparent);
+  background: color-mix(in srgb, var(--recipe-color, var(--primary)) 15%, transparent);
+  box-shadow: 0 0 16px var(--primary-glow);
 }
 
 .recipeItemActive::after {

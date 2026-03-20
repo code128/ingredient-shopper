@@ -113,6 +113,9 @@
   font-weight: 600;
   color: var(--text-color);
   text-transform: capitalize;
+  position: relative;
+  display: inline-block;
+  transition: color 0.3s ease;
 }
 
 .ingredientDetails {
@@ -255,30 +258,44 @@
 }
 
 .checkbox {
-  width: 20px;
-  height: 20px;
-  border: 2px solid var(--card-border);
+  width: 22px;
+  height: 22px;
+  border: 2px solid var(--text-secondary);
   border-radius: 6px;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s;
-  background: var(--bg-color);
+  transition: all 0.3s ease;
+  background: var(--card-bg);
 }
 
 .checkboxChecked {
-  background: var(--primary);
   border-color: var(--primary);
-  color: white;
+  box-shadow: 0 0 12px var(--primary-glow);
 }
 
 .ingredientChecked {
-  opacity: 0.6;
+  opacity: 0.5;
+  transform: scale(0.98);
 }
 
 .ingredientChecked .ingredientName {
-  text-decoration: line-through;
   color: var(--text-secondary);
+}
+
+.ingredientChecked .ingredientName::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  height: 2px;
+  background: var(--text-secondary);
+  animation: strikeline 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes strikeline {
+  from { width: 0; }
+  to { width: 100%; }
 }
 
 @media (max-width: 768px) {
