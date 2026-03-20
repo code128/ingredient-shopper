@@ -133,6 +133,7 @@ If you are using this codebase to learn React and modern JavaScript architecture
 - **Change the Hosting Provider:** Switch to a different hosting provider, for example, Netlify, AWS, GCP, Azure or something else entirely.
 - **Change the Deployment Strategy:** Switch to a different deployment strategy, for example, Docker, Terraform, etc
 #### UI / UX focused
+- **Change the Application Style Entirely:** Use Stitch to come up with a totally new design language, bring a screenshot into figma and try figma make, hook up a figma MCP to another AI agent and see what you can create.
 - **Change the UI Framework:** Switch to a different UI framework, for example, Tailwind CSS.
 - **Change the Animation Library:** Switch to a different animation library, for example, GSAP.
 ---

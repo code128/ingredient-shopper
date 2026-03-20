@@ -115,6 +115,28 @@ export default function RecipeEditor({ recipe, onClose, onRecipeUpdated }: Recip
     }
   };
 
+  const handleTitleBlur = async () => {
+    if (title.trim() === recipe.title || !title.trim() || isReadOnly) return;
+    
+    try {
+      const res = await fetch(`/api/recipes/${recipe.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title: title.trim() }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        onRecipeUpdated();
+      } else {
+        setError(data.error || 'Failed to auto-save title');
+        setTitle(recipe.title);
+      }
+    } catch (err) {
+      setError('An error occurred while auto-saving title');
+      setTitle(recipe.title);
+    }
+  };
+
   return (
     <div className={styles.container}>
       <div className={styles.header}>
@@ -125,6 +147,7 @@ export default function RecipeEditor({ recipe, onClose, onRecipeUpdated }: Recip
           type="text"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
+          onBlur={handleTitleBlur}
           className={styles.titleInput}
           placeholder="Recipe Title"
           disabled={saving || isReadOnly}
