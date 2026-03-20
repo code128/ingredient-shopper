@@ -135,8 +135,10 @@ export default function RecipeEditor({ recipe, onClose, onRecipeUpdated }: Recip
 
       <div className={styles.tableHeader}>
         <div className={styles.colName}>Name</div>
-        <div className={styles.colQty}>Qty</div>
-        <div className={styles.colUnit}>Unit</div>
+        <div className={styles.qtyUnitGroup}>
+          <div className={styles.colQty}>Qty</div>
+          <div className={styles.colUnit}>Unit</div>
+        </div>
         <div className={styles.colOriginal}>Original Text</div>
       </div>
 
@@ -151,28 +153,30 @@ export default function RecipeEditor({ recipe, onClose, onRecipeUpdated }: Recip
                 placeholder="Ingredient Name"
                 className={styles.input}
                 disabled={saving || isReadOnly}
-                style={{ fontWeight: 600 }}
+                style={{ fontWeight: 600, textTransform: 'capitalize' }}
               />
             </div>
-            <div className={styles.colQty}>
-              <input
-                type="text"
-                value={ri.quantity}
-                onChange={(e) => handleFieldChange(ri.id, 'quantity', e.target.value)}
-                placeholder="Qty"
-                className={styles.input}
-                disabled={saving || isReadOnly}
-              />
-            </div>
-            <div className={styles.colUnit}>
-              <input
-                type="text"
-                value={ri.unit}
-                onChange={(e) => handleFieldChange(ri.id, 'unit', e.target.value)}
-                placeholder="Unit"
-                className={styles.input}
-                disabled={saving || isReadOnly}
-              />
+            <div className={styles.qtyUnitGroup}>
+              <div className={styles.colQty}>
+                <input
+                  type="text"
+                  value={ri.quantity}
+                  onChange={(e) => handleFieldChange(ri.id, 'quantity', e.target.value)}
+                  placeholder="Qty"
+                  className={styles.input}
+                  disabled={saving || isReadOnly}
+                />
+              </div>
+              <div className={styles.colUnit}>
+                <input
+                  type="text"
+                  value={ri.unit}
+                  onChange={(e) => handleFieldChange(ri.id, 'unit', e.target.value)}
+                  placeholder="Unit"
+                  className={styles.input}
+                  disabled={saving || isReadOnly}
+                />
+              </div>
             </div>
             <div className={styles.colOriginal}>
               <input
