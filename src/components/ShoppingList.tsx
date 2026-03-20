@@ -265,10 +265,15 @@ export default function ShoppingList({ recipes, onRecipeClick }: ShoppingListPro
                               key={r.id} 
                               className={styles.chip} 
                               title={r.title}
-                              style={{ '--chip-color': `var(--palette-${r.colorIndex})` } as React.CSSProperties}
+                              style={{ 
+                                '--chip-color': `var(--palette-${r.colorIndex})`,
+                                cursor: shoppingMode ? 'default' : 'pointer'
+                              } as React.CSSProperties}
                               onClick={(e) => {
                                 e.stopPropagation();
-                                onRecipeClick?.(r.id);
+                                if (!shoppingMode) {
+                                  onRecipeClick?.(r.id);
+                                }
                               }}
                             >
                               {r.title.split(' ')[0]}
