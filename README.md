@@ -21,6 +21,55 @@ Instead of relying on rigid, hardcoded scraping tools, this app leverages **Gene
 - **Authentication:** Passwordless "Magic Links" powered by Auth.js and Resend, wiping out the need to manage user passwords.
 - **PWA Framework:** Service Workers managed by `@serwist/next` aggressively cache the UI structure, allowing the app to render quickly without Wi-Fi.
 
+```mermaid
+flowchart TB
+    classDef client fill:#3b82f6,stroke:#1d4ed8,stroke-width:2px,color:#fff,rx:8px,ry:8px;
+    classDef nextjs fill:#171717,stroke:#404040,stroke-width:2px,color:#fff,rx:8px,ry:8px;
+    classDef ai fill:#8b5cf6,stroke:#6d28d9,stroke-width:2px,color:#fff,rx:8px,ry:8px;
+    classDef db fill:#10b981,stroke:#047857,stroke-width:2px,color:#fff,rx:8px,ry:8px;
+    classDef external fill:#f59e0b,stroke:#b45309,stroke-width:2px,color:#fff,rx:8px,ry:8px;
+
+    Client["📱 User Device (Browser / PWA)"]:::client
+    ServiceWorker["⚙️ Serwist (Offline Caching)"]:::client
+
+    subgraph "Next.js Application Architecture"
+        Frontend["⚛️ React 19 Frontend\n(App Router + Framer Motion)"]:::nextjs
+        ServerActions["⚡ Next.js Server\n(Server Components & APIs)"]:::nextjs
+        API_Auth["🔐 Auth.js / NextAuth"]:::nextjs
+        API_Scraping["🕸️ Cheerio Scraper"]:::nextjs
+        API_Prisma["🗄️ Prisma ORM"]:::nextjs
+    end
+
+    subgraph "External Cloud Services"
+        Gemini["🧠 Google Gemini AI\n(Data Extraction & Sorting)"]:::ai
+        Resend["📧 Resend API\n(Magic Links via Email)"]:::external
+    end
+
+    subgraph "Database Infrastructure"
+        Neon[("🐘 Neon.tech\nServerless PostgreSQL")]:::db
+    end
+
+    %% Core Data Flow
+    Client <-->|"Provides Offline Support"| ServiceWorker
+    ServiceWorker <-->|"Renders UI"| Frontend
+    Frontend <-->|"Invokes Server Actions"| ServerActions
+    
+    %% Authentication Flow
+    ServerActions -->|"Handles Passwordless Login"| API_Auth
+    API_Auth -->|"Sends OTP/Magic Link Emails"| Resend
+    API_Auth <-->|"Manages User Sessions"| API_Prisma
+    
+    %% AI & Core Feature Flow
+    ServerActions -->|"Fetches Recipe Page HTML"| API_Scraping
+    ServerActions -->|"Sends DOM Text or Image"| Gemini
+    API_Scraping -.->|"Passes Raw DOM Text"| Gemini
+    Gemini -->|"Returns Categorized Ingredients JSON"| ServerActions
+    
+    %% Database Flow
+    ServerActions <-->|"Type-Safe CRUD"| API_Prisma
+    API_Prisma <-->|"TCP/SQL Connections\n(Scales to Zero)"| Neon
+```
+
 ## 🚀 Cloning & Learning (Getting Started)
 
 Want to deploy it yourself or use the codebase to learn Next.js App Router patterns? Run the following commands:
