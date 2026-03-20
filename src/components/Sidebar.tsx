@@ -125,7 +125,7 @@ export default function Sidebar({ recipes, onToggleSelection, activeRecipeId, on
       
       <div className={styles.feedbackContainer}>
         <a 
-          href="mailto:joshbloom@google.com?subject=Recipe%20Ingredient%20Shopper%20Feedback" 
+          href="mailto:joshbloom@gmail.com?subject=Recipe%20Ingredient%20Shopper%20Feedback" 
           className={styles.feedbackLink}
         >
           Send Feedback

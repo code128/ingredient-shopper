@@ -80,6 +80,6 @@ model RecipeIngredient {
   unit         String?
   originalText String
 
-  recipe     Recipe     @relation(fields: [recipeId], references: [id])
+  recipe     Recipe     @relation(fields: [recipeId], references: [id], onDelete: Cascade)
   ingredient Ingredient @relation(fields: [ingredientId], references: [id])
 }
