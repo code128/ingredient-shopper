@@ -57,8 +57,26 @@ export default function Home() {
     fetchRecipes();
   }, [session]);
 
-  const handleToggleSelection = (id: string) => {
-    setRecipes(prev => prev.map(r => r.id === id ? { ...r, isSelected: !r.isSelected } : r));
+  const handleToggleSelection = async (id: string) => {
+    const recipe = recipes.find(r => r.id === id);
+    if (!recipe) return;
+
+    const newIsSelected = !recipe.isSelected;
+
+    // Optimistically update UI
+    setRecipes(prev => prev.map(r => r.id === id ? { ...r, isSelected: newIsSelected } : r));
+
+    try {
+      await fetch(`/api/recipes/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ isSelected: newIsSelected }),
+      });
+    } catch (error) {
+      console.error('Failed to save selection state:', error);
+      // Rollback on failure
+      setRecipes(prev => prev.map(r => r.id === id ? { ...r, isSelected: !newIsSelected } : r));
+    }
   };
 
   const handleSelectRecipe = (id: string) => {
