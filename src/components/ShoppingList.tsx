@@ -39,6 +39,17 @@ export default function ShoppingList({ recipes, onRecipeClick }: ShoppingListPro
   const [manuallyOpenedCats, setManuallyOpenedCats] = useState<Set<string>>(new Set());
   const [manuallyCollapsedCats, setManuallyCollapsedCats] = useState<Set<string>>(new Set());
 
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('shoppingListCheckedItems');
+      if (saved) {
+        setCheckedItems(new Set(JSON.parse(saved)));
+      }
+    } catch (e) {
+      console.error('Failed to load checked items', e);
+    }
+  }, []);
+
   const handleToggleCollapse = (cat: string, isCollapsed: boolean, isAutoCollapsed: boolean) => {
     if (isCollapsed) {
       if (isAutoCollapsed) {
@@ -58,6 +69,11 @@ export default function ShoppingList({ recipes, onRecipeClick }: ShoppingListPro
         next.delete(key);
       } else {
         next.add(key);
+      }
+      try {
+        localStorage.setItem('shoppingListCheckedItems', JSON.stringify(Array.from(next)));
+      } catch (e) {
+        console.error('Failed to save checked items', e);
       }
       return next;
     });
