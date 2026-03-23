@@ -91,6 +91,15 @@ export default function ShoppingList({ recipes, onRecipeClick }: ShoppingListPro
     });
   };
 
+  const clearCheckedItems = () => {
+    setCheckedItems(new Set());
+    try {
+      localStorage.removeItem('shoppingListCheckedItems');
+    } catch (e) {
+      console.error('Failed to clear checked items', e);
+    }
+  };
+
   useEffect(() => {
     const selectedRecipes = recipes.filter(r => r.isSelected);
     const categories = Array.from(new Set(
@@ -315,6 +324,14 @@ export default function ShoppingList({ recipes, onRecipeClick }: ShoppingListPro
           </div>
         );
       })}
+
+      {shoppingMode && checkedItems.size > 0 && (
+        <div className={styles.clearContainer}>
+          <button className={styles.clearButton} onClick={clearCheckedItems}>
+            Uncheck All Ingredients
+          </button>
+        </div>
+      )}
     </div>
   );
 }
