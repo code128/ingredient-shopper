@@ -167,6 +167,9 @@ export default function ShoppingList({ recipes, onRecipeClick }: ShoppingListPro
 
   selectedRecipes.forEach(recipe => {
     recipe.ingredients.forEach(ri => {
+      // Water is always assumed to be on hand — skip it
+      if (ri.ingredient.name.trim().toLowerCase() === 'water') return;
+
       const cat = ri.ingredient.category || 'Other';
       const name = ri.ingredient.name;
       const qty = ri.quantity || 0;
