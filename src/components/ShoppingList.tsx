@@ -201,17 +201,90 @@ export default function ShoppingList({ recipes, onRecipeClick }: ShoppingListPro
   const missingCats = Object.keys(aggregated).filter(c => !categoryOrder.includes(c));
   const displayCategories = [...categories, ...missingCats.sort()];
 
+  const handlePrint = () => {
+    const recipeTitles = selectedRecipes.map(r => r.title).join(', ');
+    const rows = displayCategories.map(cat => {
+      const items = Object.entries(aggregated[cat]).sort((a, b) => a[0].localeCompare(b[0]));
+      const itemRows = items.map(([name, details]) => {
+        const amtText = details.quantity > 0
+          ? `${details.quantity}${details.unit ? ' ' + details.unit : ''}`
+          : details.originals[0] || '';
+        const recipePills = details.recipes
+          .map(r => `<span class="pill">${r.title}</span>`)
+          .join('');
+        return `<tr>
+          <td class="check">&#x2610;</td>
+          <td class="name"><span class="name-row"><span class="name-text">${name}</span><span class="pills">${recipePills}</span></span></td>
+          <td class="amt">${amtText}</td>
+        </tr>`;
+      }).join('');
+      return `<tbody>
+        <tr class="cat-header"><td colspan="3">${cat}</td></tr>
+        ${itemRows}
+      </tbody>`;
+    }).join('');
+
+    const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Shopping List</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; color: #111; padding: 2rem; max-width: 680px; margin: auto; }
+    h1 { font-size: 1.6rem; font-weight: 800; letter-spacing: -0.03em; margin-bottom: 0.25rem; }
+    .meta { font-size: 0.8rem; color: #666; margin-bottom: 1.5rem; }
+    table { width: 100%; border-collapse: collapse; }
+    .cat-header td { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #555; padding: 1rem 0 0.4rem; border-bottom: 1.5px solid #111; }
+    tr:not(.cat-header) td { padding: 0.55rem 0.25rem; border-bottom: 1px solid #e5e5e5; font-size: 0.95rem; vertical-align: middle; }
+    td.check { width: 28px; font-size: 1.1rem; color: #bbb; padding-right: 0.5rem; }
+    td.name { font-weight: 500; text-transform: capitalize; }
+    td.amt { text-align: right; color: #555; font-size: 0.85rem; white-space: nowrap; padding-left: 0.75rem; }
+    .name-row { display: inline-flex; align-items: center; gap: 0.4rem; flex-wrap: wrap; }
+    .name-text { text-transform: capitalize; }
+    .pills { display: inline-flex; flex-wrap: wrap; gap: 0.25rem; }
+    .pill { font-size: 0.65rem; font-weight: 600; padding: 0.15rem 0.45rem; border-radius: 999px; background: #f0f0f0; color: #555; border: 1px solid #ddd; white-space: nowrap; }
+    @media print {
+      body { padding: 1rem; }
+      button { display: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <h1>&#x1F6D2; Shopping List</h1>
+  <p class="meta">${selectedRecipes.length} ${selectedRecipes.length === 1 ? 'recipe' : 'recipes'}: ${recipeTitles}</p>
+  <table>${rows}</table>
+  <script>window.onload = () => { window.print(); }<\/script>
+</body>
+</html>`;
+
+    const win = window.open('', '_blank', 'width=720,height=900');
+    if (win) {
+      win.document.write(html);
+      win.document.close();
+    }
+  };
+
   return (
     <div className={styles.container}>
       <div className={styles.header}>
         <div className={styles.headerTitleLine}>
           <h1 className={styles.title}>Shopping List</h1>
-          <button 
-            className={`${styles.shoppingButton} ${shoppingMode ? styles.shoppingButtonActive : ''}`}
-            onClick={() => setShoppingMode(!shoppingMode)}
-          >
-            {shoppingMode ? 'Exit Shopping Mode' : 'Start Shopping'}
-          </button>
+          <div className={styles.headerActions}>
+            <button
+              className={styles.printButton}
+              onClick={handlePrint}
+              title="Print shopping list"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+            </button>
+            <button 
+              className={`${styles.shoppingButton} ${shoppingMode ? styles.shoppingButtonActive : ''}`}
+              onClick={() => setShoppingMode(!shoppingMode)}
+            >
+              {shoppingMode ? 'Exit Shopping Mode' : 'Start Shopping'}
+            </button>
+          </div>
         </div>
         <p className={styles.subtitle}>{selectedRecipes.length} {selectedRecipes.length === 1 ? 'recipe' : 'recipes'} selected</p>
       </div>
