@@ -7,6 +7,7 @@ import styles from './RecipeEditor.module.css';
 interface Ingredient {
   id: string;
   name: string;
+  category?: string | null;
 }
 
 interface RecipeIngredient {
@@ -40,7 +41,8 @@ export default function RecipeEditor({ recipe, onClose, onRecipeUpdated }: Recip
       quantity: ri.quantity !== null ? String(ri.quantity) : '',
       unit: ri.unit || '',
       originalText: ri.originalText,
-      name: ri.ingredient.name
+      name: ri.ingredient.name,
+      category: ri.ingredient.category || 'Other'
     }))
   );
   
@@ -65,6 +67,7 @@ export default function RecipeEditor({ recipe, onClose, onRecipeUpdated }: Recip
         quantity: '',
         unit: '',
         originalText: '',
+        category: 'Other',
       },
     ]);
   };
@@ -171,65 +174,91 @@ export default function RecipeEditor({ recipe, onClose, onRecipeUpdated }: Recip
       </div>
 
       <div className={styles.ingredientList}>
-        {ingredients.map(ri => (
-          <div key={ri.id} className={styles.ingredientRow}>
-            <div className={styles.colName}>
-              <input
-                type="text"
-                value={ri.name}
-                onChange={(e) => handleFieldChange(ri.id, 'name', e.target.value)}
-                placeholder="Ingredient Name"
-                className={styles.input}
-                disabled={saving || isReadOnly}
-                style={{ fontWeight: 600, textTransform: 'capitalize' }}
-              />
-            </div>
-            <div className={styles.qtyUnitGroup}>
-              <div className={styles.colQty}>
-                <input
-                  type="text"
-                  value={ri.quantity}
-                  onChange={(e) => handleFieldChange(ri.id, 'quantity', e.target.value)}
-                  placeholder="Qty"
-                  className={styles.input}
-                  disabled={saving || isReadOnly}
-                />
+        {(() => {
+          const groupedIngredients = ingredients.reduce((acc, ri) => {
+            const cat = ri.category || 'Other';
+            if (!acc[cat]) acc[cat] = [];
+            acc[cat].push(ri);
+            return acc;
+          }, {} as Record<string, typeof ingredients>);
+
+          const sortedCategories = Object.keys(groupedIngredients).sort((a, b) => {
+            if (a === 'Other') return 1;
+            if (b === 'Other') return -1;
+            return a.localeCompare(b);
+          });
+
+          sortedCategories.forEach(cat => {
+            groupedIngredients[cat].sort((a, b) => a.name.localeCompare(b.name));
+          });
+
+          return sortedCategories.map(cat => (
+            <React.Fragment key={cat}>
+              <div className={styles.categoryHeader}>
+                <div className={styles.categoryTitle}>{cat}</div>
               </div>
-              <div className={styles.colUnit}>
-                <input
-                  type="text"
-                  value={ri.unit}
-                  onChange={(e) => handleFieldChange(ri.id, 'unit', e.target.value)}
-                  placeholder="Unit"
-                  className={styles.input}
-                  disabled={saving || isReadOnly}
-                />
-              </div>
-            </div>
-            <div className={styles.colOriginal}>
-              <input
-                type="text"
-                value={ri.originalText}
-                onChange={(e) => handleFieldChange(ri.id, 'originalText', e.target.value)}
-                placeholder="Original description"
-                className={styles.input}
-                disabled={saving || isReadOnly}
-              />
-            </div>
-            {!isReadOnly && (
-              <div className={styles.colAction}>
-                <button
-                  onClick={() => handleRemoveIngredient(ri.id)}
-                  className={styles.removeIngredientButton}
-                  disabled={saving}
-                  title="Remove ingredient"
-                >
-                  ✕
-                </button>
-              </div>
-            )}
-          </div>
-        ))}
+              {groupedIngredients[cat].map(ri => (
+                <div key={ri.id} className={styles.ingredientRow}>
+                  <div className={styles.colName}>
+                    <input
+                      type="text"
+                      value={ri.name}
+                      onChange={(e) => handleFieldChange(ri.id, 'name', e.target.value)}
+                      placeholder="Ingredient Name"
+                      className={styles.input}
+                      disabled={saving || isReadOnly}
+                      style={{ fontWeight: 600, textTransform: 'capitalize' }}
+                    />
+                  </div>
+                  <div className={styles.qtyUnitGroup}>
+                    <div className={styles.colQty}>
+                      <input
+                        type="text"
+                        value={ri.quantity}
+                        onChange={(e) => handleFieldChange(ri.id, 'quantity', e.target.value)}
+                        placeholder="Qty"
+                        className={styles.input}
+                        disabled={saving || isReadOnly}
+                      />
+                    </div>
+                    <div className={styles.colUnit}>
+                      <input
+                        type="text"
+                        value={ri.unit}
+                        onChange={(e) => handleFieldChange(ri.id, 'unit', e.target.value)}
+                        placeholder="Unit"
+                        className={styles.input}
+                        disabled={saving || isReadOnly}
+                      />
+                    </div>
+                  </div>
+                  <div className={styles.colOriginal}>
+                    <input
+                      type="text"
+                      value={ri.originalText}
+                      onChange={(e) => handleFieldChange(ri.id, 'originalText', e.target.value)}
+                      placeholder="Original description"
+                      className={styles.input}
+                      disabled={saving || isReadOnly}
+                    />
+                  </div>
+                  {!isReadOnly && (
+                    <div className={styles.colAction}>
+                      <button
+                        onClick={() => handleRemoveIngredient(ri.id)}
+                        className={styles.removeIngredientButton}
+                        disabled={saving}
+                        title="Remove ingredient"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </React.Fragment>
+          ));
+        })()}
       </div>
 
       {!isReadOnly && (

@@ -101,6 +101,20 @@
   border-bottom: 1px solid var(--card-border);
 }
 
+.categoryHeader {
+  padding: 0.75rem 1rem 0.25rem 1rem;
+  background: var(--bg-color);
+  border-bottom: 1px solid var(--card-border);
+}
+
+.categoryTitle {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--primary);
+}
+
 .ingredientRow:last-child {
   border-bottom: none;
 }
