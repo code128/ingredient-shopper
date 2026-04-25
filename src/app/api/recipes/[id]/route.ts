@@ -79,6 +79,17 @@ export async function PATCH(
             });
           }
         }
+
+        const incomingIds = ingredients
+          .map((ri: any) => ri.id)
+          .filter((riId: string) => !riId.startsWith('new-'));
+
+        await tx.recipeIngredient.deleteMany({
+          where: {
+            recipeId: id,
+            id: { notIn: incomingIds }
+          }
+        });
       });
       updated = true;
     }

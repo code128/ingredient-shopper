@@ -52,6 +52,10 @@ export default function RecipeEditor({ recipe, onClose, onRecipeUpdated }: Recip
     setIngredients(prev => prev.map(ri => ri.id === id ? { ...ri, [field]: value } : ri));
   };
 
+  const handleRemoveIngredient = (id: string) => {
+    setIngredients(prev => prev.filter(ri => ri.id !== id));
+  };
+
   const handleAddIngredient = () => {
     setIngredients(prev => [
       ...prev,
@@ -163,6 +167,7 @@ export default function RecipeEditor({ recipe, onClose, onRecipeUpdated }: Recip
           <div className={styles.colUnit}>Unit</div>
         </div>
         <div className={styles.colOriginal}>Original Text</div>
+        {!isReadOnly && <div className={styles.colAction}></div>}
       </div>
 
       <div className={styles.ingredientList}>
@@ -211,6 +216,18 @@ export default function RecipeEditor({ recipe, onClose, onRecipeUpdated }: Recip
                 disabled={saving || isReadOnly}
               />
             </div>
+            {!isReadOnly && (
+              <div className={styles.colAction}>
+                <button
+                  onClick={() => handleRemoveIngredient(ri.id)}
+                  className={styles.removeIngredientButton}
+                  disabled={saving}
+                  title="Remove ingredient"
+                >
+                  ✕
+                </button>
+              </div>
+            )}
           </div>
         ))}
       </div>

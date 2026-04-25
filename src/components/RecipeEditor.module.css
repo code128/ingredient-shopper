@@ -183,6 +183,32 @@
 .colQty { width: 80px; }
 .colUnit { width: 100px; }
 .colOriginal { flex: 1; }
+.colAction { 
+  width: 40px; 
+  display: flex; 
+  justify-content: center; 
+  align-items: center; 
+}
+
+.removeIngredientButton {
+  background: transparent;
+  color: var(--text-secondary);
+  border: none;
+  cursor: pointer;
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  transition: all 0.2s;
+}
+
+.removeIngredientButton:hover {
+  background: #fee2e2;
+  color: #ef4444;
+}
 
 .qtyUnitGroup {
   display: contents;
@@ -237,9 +263,15 @@
     padding: 1rem;
   }
 
-  .colName, .colOriginal {
+  .colName, .colOriginal, .colAction {
     width: 100%;
     flex: none;
+  }
+  
+  .colAction {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: -0.5rem;
   }
   
   .qtyUnitGroup {
