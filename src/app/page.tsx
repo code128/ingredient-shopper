@@ -86,6 +86,12 @@ export default function Home() {
 
   const activeRecipe = recipes.find(r => r.id === activeRecipeId);
 
+  const defaultCategories = ['Produce', 'Meat', 'Dairy', 'Pantry', 'Frozen', 'Other'];
+  const existingCategories = Array.from(new Set([
+    ...defaultCategories,
+    ...recipes.flatMap(r => r.ingredients.map(ri => ri.ingredient.category).filter(Boolean))
+  ])) as string[];
+
   if (loading || status === 'loading') {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', color: 'var(--primary)', fontWeight: 600 }}>
@@ -123,6 +129,7 @@ export default function Home() {
             <RecipeEditor 
               key={activeRecipe.id}
               recipe={activeRecipe}
+              existingCategories={existingCategories}
               onClose={() => setActiveRecipeId(undefined)}
               onRecipeUpdated={fetchRecipes}
             />

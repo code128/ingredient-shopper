@@ -26,11 +26,12 @@ interface Recipe {
 
 interface RecipeEditorProps {
   recipe: Recipe;
+  existingCategories: string[];
   onClose: () => void;
   onRecipeUpdated: () => void;
 }
 
-export default function RecipeEditor({ recipe, onClose, onRecipeUpdated }: RecipeEditorProps) {
+export default function RecipeEditor({ recipe, existingCategories, onClose, onRecipeUpdated }: RecipeEditorProps) {
   const { data: session } = useSession();
   const isReadOnly = !session?.user;
 
@@ -42,9 +43,12 @@ export default function RecipeEditor({ recipe, onClose, onRecipeUpdated }: Recip
       unit: ri.unit || '',
       originalText: ri.originalText,
       name: ri.ingredient.name,
-      category: ri.ingredient.category || 'Other'
+      category: ri.ingredient.category || 'Other',
+      displayCategory: ri.ingredient.category || 'Other'
     }))
   );
+  
+  const [customCategoryIds, setCustomCategoryIds] = useState<Set<string>>(new Set());
   
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -68,6 +72,7 @@ export default function RecipeEditor({ recipe, onClose, onRecipeUpdated }: Recip
         unit: '',
         originalText: '',
         category: 'Other',
+        displayCategory: 'Other',
       },
     ]);
   };
@@ -169,6 +174,7 @@ export default function RecipeEditor({ recipe, onClose, onRecipeUpdated }: Recip
           <div className={styles.colQty}>Qty</div>
           <div className={styles.colUnit}>Unit</div>
         </div>
+        <div className={styles.colCategory}>Category</div>
         <div className={styles.colOriginal}>Original Text</div>
         {!isReadOnly && <div className={styles.colAction}></div>}
       </div>
@@ -176,7 +182,7 @@ export default function RecipeEditor({ recipe, onClose, onRecipeUpdated }: Recip
       <div className={styles.ingredientList}>
         {(() => {
           const groupedIngredients = ingredients.reduce((acc, ri) => {
-            const cat = ri.category || 'Other';
+            const cat = (ri as any).displayCategory || 'Other';
             if (!acc[cat]) acc[cat] = [];
             acc[cat].push(ri);
             return acc;
@@ -231,6 +237,52 @@ export default function RecipeEditor({ recipe, onClose, onRecipeUpdated }: Recip
                         disabled={saving || isReadOnly}
                       />
                     </div>
+                  </div>
+                  <div className={styles.colCategory}>
+                    {customCategoryIds.has(ri.id) || (ri.category && !existingCategories.includes(ri.category)) ? (
+                      <div style={{ display: 'flex', gap: '0.25rem' }}>
+                        <input
+                          type="text"
+                          value={ri.category}
+                          onChange={(e) => handleFieldChange(ri.id, 'category', e.target.value)}
+                          placeholder="New category"
+                          className={styles.input}
+                          disabled={saving || isReadOnly}
+                          style={{ textTransform: 'capitalize', flex: 1, minWidth: 0 }}
+                          autoFocus
+                        />
+                        <button 
+                          onClick={() => {
+                             setCustomCategoryIds(prev => { const s = new Set(prev); s.delete(ri.id); return s; });
+                             handleFieldChange(ri.id, 'category', 'Other');
+                          }}
+                          className={styles.backToSelectButton}
+                          title="Back to list"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    ) : (
+                      <select
+                        value={ri.category || 'Other'}
+                        onChange={(e) => {
+                          if (e.target.value === '___custom___') {
+                            setCustomCategoryIds(prev => { const s = new Set(prev); s.add(ri.id); return s; });
+                            handleFieldChange(ri.id, 'category', '');
+                          } else {
+                            handleFieldChange(ri.id, 'category', e.target.value);
+                          }
+                        }}
+                        className={styles.input}
+                        disabled={saving || isReadOnly}
+                        style={{ textTransform: 'capitalize', cursor: 'pointer', paddingRight: '2rem' }}
+                      >
+                        {existingCategories.map(cat => (
+                          <option key={cat} value={cat}>{cat}</option>
+                        ))}
+                        <option value="___custom___">+ New Category...</option>
+                      </select>
+                    )}
                   </div>
                   <div className={styles.colOriginal}>
                     <input

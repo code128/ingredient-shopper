@@ -196,6 +196,7 @@
 .colName { flex: 1.5; }
 .colQty { width: 80px; }
 .colUnit { width: 100px; }
+.colCategory { flex: 1; }
 .colOriginal { flex: 1; }
 .colAction { 
   width: 40px; 
@@ -226,6 +227,24 @@
 
 .qtyUnitGroup {
   display: contents;
+}
+
+.backToSelectButton {
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  transition: all 0.2s;
+}
+
+.backToSelectButton:hover {
+  background: var(--card-bg);
+  color: var(--text-color);
 }
 
 .addButton {
@@ -277,7 +296,7 @@
     padding: 1rem;
   }
 
-  .colName, .colOriginal, .colAction {
+  .colName, .colCategory, .colOriginal, .colAction {
     width: 100%;
     flex: none;
   }
@@ -302,6 +321,7 @@
   .colName::before { content: "Ingredient Name"; display: block; font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 0.25rem; text-transform: uppercase; letter-spacing: 0.05em; }
   .colQty::before { content: "Quantity"; display: block; font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 0.25rem; text-transform: uppercase; letter-spacing: 0.05em; }
   .colUnit::before { content: "Unit"; display: block; font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 0.25rem; text-transform: uppercase; letter-spacing: 0.05em; }
+  .colCategory::before { content: "Category"; display: block; font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 0.25rem; text-transform: uppercase; letter-spacing: 0.05em; }
   .colOriginal::before { content: "Original Text"; display: block; font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 0.25rem; text-transform: uppercase; letter-spacing: 0.05em; }
   
   .actions {

@@ -49,7 +49,15 @@ export async function PATCH(
             
             if (!ingredient) {
               ingredient = await tx.ingredient.create({
-                data: { name: trimmedName }
+                data: { 
+                  name: trimmedName,
+                  category: ri.category || null
+                }
+              });
+            } else if (ri.category && ingredient.category !== ri.category) {
+              ingredient = await tx.ingredient.update({
+                where: { id: ingredient.id },
+                data: { category: ri.category }
               });
             }
             ingredientId = ingredient.id;
