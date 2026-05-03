@@ -7,6 +7,55 @@ interface AddRecipeFormProps {
   onRecipeAdded: () => void;
 }
 
+const compressImage = (file: File): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        let { width, height } = img;
+        const MAX_DIMENSION = 2000;
+        
+        if (width > height && width > MAX_DIMENSION) {
+          height = Math.round((height * MAX_DIMENSION) / width);
+          width = MAX_DIMENSION;
+        } else if (height > MAX_DIMENSION) {
+          width = Math.round((width * MAX_DIMENSION) / height);
+          height = MAX_DIMENSION;
+        }
+        
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        
+        if (!ctx) {
+          resolve(e.target?.result as string);
+          return;
+        }
+        
+        ctx.drawImage(img, 0, 0, width, height);
+        
+        // Vercel payload limit is 4.5MB. Aim for ~3.5MB base64 length max.
+        const MAX_B64_LENGTH = 3.5 * 1024 * 1024;
+        let quality = 0.85;
+        let dataUrl = canvas.toDataURL('image/jpeg', quality);
+        
+        while (dataUrl.length > MAX_B64_LENGTH && quality > 0.1) {
+          quality -= 0.15;
+          dataUrl = canvas.toDataURL('image/jpeg', quality);
+        }
+        
+        resolve(dataUrl);
+      };
+      img.onerror = reject;
+      img.src = e.target?.result as string;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+};
+
 export default function AddRecipeForm({ onRecipeAdded }: AddRecipeFormProps) {
   const [activeTab, setActiveTab] = useState<'url' | 'image'>('image');
   const [url, setUrl] = useState('');
@@ -44,45 +93,41 @@ export default function AddRecipeForm({ onRecipeAdded }: AddRecipeFormProps) {
     }
   };
 
-  const processFile = (file?: File) => {
+  const processFile = async (file?: File) => {
     if (!file) return;
 
     setImageFile(file);
     setLoading(true);
     setError(null);
 
-    const reader = new FileReader();
-    reader.onloadend = async () => {
-      const base64Image = reader.result as string;
+    try {
+      const base64Image = await compressImage(file);
       setImagePreview(base64Image);
       
-      try {
-        const res = await fetch('/api/ingest/image', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ 
-            image: base64Image,
-            mimeType: file.type || 'image/jpeg'
-          }),
-        });
+      const res = await fetch('/api/ingest/image', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          image: base64Image,
+          mimeType: 'image/jpeg'
+        }),
+      });
 
-        const data = await res.json();
-        if (data.success) {
-          setImageFile(null);
-          setImagePreview(null);
-          onRecipeAdded();
-        } else {
-          setError(data.error || 'Failed to process image');
-          setImagePreview(null);
-        }
-      } catch (err) {
-        setError('An error occurred while processing image');
+      const data = await res.json();
+      if (data.success) {
+        setImageFile(null);
         setImagePreview(null);
-      } finally {
-        setLoading(false);
+        onRecipeAdded();
+      } else {
+        setError(data.error || 'Failed to process image');
+        setImagePreview(null);
       }
-    };
-    reader.readAsDataURL(file);
+    } catch (err) {
+      setError('An error occurred while processing image');
+      setImagePreview(null);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
